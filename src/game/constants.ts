@@ -9,8 +9,11 @@ export function getLevelDurationMs(level: number): number {
 }
 
 /** Number of falling letters per level; more = harder to pick out the right ones. */
-export function getLettersPerLevel(level: number, wordLength: number): number {
-  return Math.max(wordLength + 16, 28 + level * 4)
+export function getLettersPerLevel(level: number, _wordLength: number): number {
+  if (level <= 5) return 16
+  if (level <= 10) return 18
+  if (level <= 15) return 20
+  return 22
 }
 
 /** Fall animation duration in ms (how long one letter takes to cross the screen). */
