@@ -9,10 +9,17 @@ export interface FallingLetter {
   progress: number
   /** Whether this letter was the next correct one and has been clicked */
   collected: boolean
+  /** When the letter was collected (for keeping in list until pop animation finishes) */
+  collectedAt?: number
+  /** 0–1: horizontal start position (random across top) */
+  startX: number
+  /** Horizontal drift over the fall: added to startX as progress goes 0→1 (e.g. -0.2 to 0.2) */
+  drift: number
 }
 
 export interface GameState {
   phase: GamePhase
+  paused?: boolean
   /** Set when phase is levelComplete: why the level ended */
   levelCompleteReason?: LevelCompleteReason
   level: number

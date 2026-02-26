@@ -19,15 +19,15 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
 }
 
 describe('WordDisplay', () => {
-  it('shows placeholders for each letter when none collected', () => {
+  it('shows the target word so you can see what to spell', () => {
     render(<WordDisplay state={makeState({ targetWord: 'cat' })} />)
     expect(screen.getByTestId('word-display')).toBeInTheDocument()
-    expect(screen.getByTestId('word-char-0')).toHaveTextContent('?')
-    expect(screen.getByTestId('word-char-1')).toHaveTextContent('?')
-    expect(screen.getByTestId('word-char-2')).toHaveTextContent('?')
+    expect(screen.getByTestId('word-char-0')).toHaveTextContent('C')
+    expect(screen.getByTestId('word-char-1')).toHaveTextContent('A')
+    expect(screen.getByTestId('word-char-2')).toHaveTextContent('T')
   })
 
-  it('shows collected letters as filled', () => {
+  it('highlights letters as you collect them', () => {
     render(
       <WordDisplay
         state={makeState({ targetWord: 'cat', collectedLetters: ['c', 'a'] })}
@@ -35,7 +35,10 @@ describe('WordDisplay', () => {
     )
     expect(screen.getByTestId('word-char-0')).toHaveTextContent('C')
     expect(screen.getByTestId('word-char-1')).toHaveTextContent('A')
-    expect(screen.getByTestId('word-char-2')).toHaveTextContent('?')
+    expect(screen.getByTestId('word-char-2')).toHaveTextContent('T')
+    expect(screen.getByTestId('word-char-0')).toHaveClass('filled')
+    expect(screen.getByTestId('word-char-1')).toHaveClass('filled')
+    expect(screen.getByTestId('word-char-2')).not.toHaveClass('filled')
   })
 
   it('shows full word when all collected', () => {

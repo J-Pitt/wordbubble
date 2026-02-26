@@ -12,8 +12,8 @@ describe('LevelCompleteModal', () => {
         onNext={vi.fn()}
       />
     )
-    expect(screen.getByTestId('modal-title')).toHaveTextContent('Word completed!')
-    expect(screen.getByTestId('modal-next-button')).toHaveTextContent('Next level')
+    expect(screen.getByTestId('modal-title')).toHaveTextContent('Nice!')
+    expect(screen.getByTestId('modal-next-button')).toHaveTextContent('Next Level')
   })
 
   it('shows "Out of time!" when reason is outOfTime', () => {
@@ -24,8 +24,8 @@ describe('LevelCompleteModal', () => {
         onNext={vi.fn()}
       />
     )
-    expect(screen.getByTestId('modal-title')).toHaveTextContent('Out of time!')
-    expect(screen.getByTestId('modal-next-button')).toHaveTextContent('Continue')
+    expect(screen.getByTestId('modal-title')).toHaveTextContent("Time's Up!")
+    expect(screen.getByTestId('modal-next-button')).toHaveTextContent('Try Again')
   })
 
   it('calls onNext when button clicked', async () => {

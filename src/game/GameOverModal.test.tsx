@@ -6,8 +6,8 @@ import { GameOverModal } from './GameOverModal'
 describe('GameOverModal', () => {
   it('shows game over message', () => {
     render(<GameOverModal onRestart={vi.fn()} />)
-    expect(screen.getByTestId('game-over-title')).toHaveTextContent('Game over')
-    expect(screen.getByTestId('game-over-restart-button')).toHaveTextContent('Play again')
+    expect(screen.getByTestId('game-over-title')).toHaveTextContent('Game Over')
+    expect(screen.getByTestId('game-over-restart-button')).toHaveTextContent('Play Again')
   })
 
   it('calls onRestart when Play again clicked', async () => {

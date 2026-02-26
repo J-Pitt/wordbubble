@@ -8,9 +8,9 @@ export function getLevelDurationMs(level: number): number {
   return Math.max(8000, base + perLevel * (level - 1))
 }
 
-/** Number of falling letter "waves" or total letters to show per level (scales with word length). */
+/** Number of falling letters per level; more = harder to pick out the right ones. */
 export function getLettersPerLevel(level: number, wordLength: number): number {
-  return Math.max(wordLength + 4, 10 + level * 2)
+  return Math.max(wordLength + 16, 28 + level * 4)
 }
 
 /** Fall animation duration in ms (how long one letter takes to cross the screen). */
@@ -21,9 +21,9 @@ export function getFallDurationMs(level: number): number {
 }
 
 export const BALL_COLORS = [
-  '#e94560',
-  '#0f3460',
-  '#533483',
-  '#16c79a',
+  '#ff6b7a',
+  '#4a6fa5',
+  '#7b5cbf',
+  '#2dd4a0',
   '#ffc93c'
 ] as const
