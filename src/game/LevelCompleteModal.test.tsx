@@ -13,7 +13,7 @@ describe('LevelCompleteModal', () => {
       />
     )
     expect(screen.getByTestId('modal-title')).toHaveTextContent('Nice!')
-    expect(screen.getByTestId('modal-next-button')).toHaveTextContent('Next Level')
+    expect(screen.getByTestId('modal-next-button')).toHaveTextContent('Next Word')
   })
 
   it('shows "Out of time!" when reason is outOfTime', () => {

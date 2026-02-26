@@ -4,10 +4,9 @@ import {
   getLevelDurationMs,
   getLettersPerLevel,
   LIVES,
-  TOTAL_LEVELS,
   BALL_COLORS
 } from './constants'
-import { getWordForLevel } from './words'
+import { getWordForLevel, TOTAL_WORDS } from './words'
 import type { FallingLetter, GameState, GamePhase, LevelCompleteReason } from './types'
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('')
@@ -20,7 +19,6 @@ function randomInRange(min: number, max: number): number {
   return min + Math.random() * (max - min)
 }
 
-/** Horizontal bounds (0–1): bubbles stay between these so they don't go off the sides. */
 const X_MIN = 0.06
 const X_MAX = 0.94
 
@@ -56,14 +54,22 @@ function getNextLetterToSpawn(
     (_, i) => wordLetters.slice(0, i + 1).filter((l) => l === wordLetters[i]).length >
       collectedLetters.filter((c) => c === wordLetters[i]).length
   )
-  // Prefer letters still needed for the word, with some randomness for distractors
   if (needed.length && Math.random() < 0.6) {
     return needed[Math.floor(Math.random() * needed.length)]
   }
   return randomChoice(ALPHABET)
 }
 
+/* ---- Haptics ---- */
+
+function vibrate(pattern: number | number[]) {
+  try { navigator?.vibrate?.(pattern) } catch { /* unsupported */ }
+}
+
+/* ---- Save / Restore ---- */
+
 const SAVE_KEY = 'wordbubble-save'
+const HIGHSCORE_KEY = 'wordbubble-highscore'
 
 export interface SavedState {
   version: number
@@ -73,16 +79,31 @@ export interface SavedState {
   levelCompleteReason?: LevelCompleteReason
 }
 
+export interface HighScore {
+  name: string
+  level: number
+}
+
 export function hasSavedGame(): boolean {
   return loadSavedState() !== null
 }
 
 export function clearSavedGame(): void {
+  try { localStorage.removeItem(SAVE_KEY) } catch { /* ignore */ }
+}
+
+export function loadHighScore(): HighScore | null {
   try {
-    localStorage.removeItem(SAVE_KEY)
-  } catch {
-    /* ignore */
-  }
+    const raw = localStorage.getItem(HIGHSCORE_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw) as HighScore
+    if (typeof data.name !== 'string' || typeof data.level !== 'number') return null
+    return data
+  } catch { return null }
+}
+
+export function saveHighScore(hs: HighScore): void {
+  try { localStorage.setItem(HIGHSCORE_KEY, JSON.stringify(hs)) } catch { /* ignore */ }
 }
 
 function loadSavedState(): SavedState | null {
@@ -92,17 +113,11 @@ function loadSavedState(): SavedState | null {
     const data = JSON.parse(raw) as SavedState
     if (data.version !== 1 || !data.phase || typeof data.level !== 'number' || typeof data.lives !== 'number') return null
     return data
-  } catch {
-    return null
-  }
+  } catch { return null }
 }
 
 function saveState(state: SavedState) {
-  try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state))
-  } catch {
-    /* ignore */
-  }
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)) } catch { /* ignore */ }
 }
 
 function restoredModalState(saved: SavedState): GameState {
@@ -117,9 +132,12 @@ function restoredModalState(saved: SavedState): GameState {
     fallingLetters: [],
     levelStartTime: Date.now(),
     lettersToSpawn: getLettersPerLevel(saved.level, targetWord.length),
-    lettersSpawned: 0
+    lettersSpawned: 0,
+    streak: 0
   }
 }
+
+/* ---- Hook ---- */
 
 export function useGameState() {
   const [state, setState] = useState<GameState>(() => initLevel(1))
@@ -141,13 +159,10 @@ export function useGameState() {
     saveState({ version: 1, phase: 'playing', level, lives: newState.lives })
   }, [])
 
-  // Spawn letters when playing and not paused
+  // Spawn letters
   useEffect(() => {
     if (state.phase !== 'playing' || state.paused) {
-      if (spawnIntervalRef.current) {
-        clearInterval(spawnIntervalRef.current)
-        spawnIntervalRef.current = null
-      }
+      if (spawnIntervalRef.current) { clearInterval(spawnIntervalRef.current); spawnIntervalRef.current = null }
       return
     }
     const lettersToSpawn = getLettersPerLevel(state.level, state.targetWord.length)
@@ -157,39 +172,19 @@ export function useGameState() {
       setState((prev) => {
         if (prev.phase !== 'playing' || prev.paused) return prev
         if (prev.lettersSpawned >= prev.lettersToSpawn) return prev
-        const nextLetter = getNextLetterToSpawn(
-          prev.level,
-          prev.targetWord,
-          prev.collectedLetters,
-          prev.lettersSpawned,
-          prev.lettersToSpawn
-        )
+        const nextLetter = getNextLetterToSpawn(prev.level, prev.targetWord, prev.collectedLetters, prev.lettersSpawned, prev.lettersToSpawn)
         if (!nextLetter) return prev
-        const letter = createFallingLetter(
-          nextLetter,
-          nextIdRef.current++,
-          randomChoice(BALL_COLORS)
-        )
-        return {
-          ...prev,
-          fallingLetters: [...prev.fallingLetters, letter],
-          lettersSpawned: prev.lettersSpawned + 1
-        }
+        const letter = createFallingLetter(nextLetter, nextIdRef.current++, randomChoice(BALL_COLORS))
+        return { ...prev, fallingLetters: [...prev.fallingLetters, letter], lettersSpawned: prev.lettersSpawned + 1 }
       })
     }, spawnIntervalMs)
-    return () => {
-      if (spawnIntervalRef.current) {
-        clearInterval(spawnIntervalRef.current)
-        spawnIntervalRef.current = null
-      }
-    }
+    return () => { if (spawnIntervalRef.current) { clearInterval(spawnIntervalRef.current); spawnIntervalRef.current = null } }
   }, [state.phase, state.paused, state.level])
 
-  // Fall animation (paused = frozen)
+  // Fall animation
   useEffect(() => {
     if (state.phase !== 'playing' || state.paused) return
     const fallDuration = getFallDurationMs(state.level)
-
     const POP_DURATION_MS = 500
     const tick = (now: number) => {
       const dt = lastTickRef.current ? (now - lastTickRef.current) / 1000 : 0
@@ -200,18 +195,12 @@ export function useGameState() {
         const fallRate = 1 / (fallDuration / 1000)
         const updated = prev.fallingLetters
           .filter((f) => {
-            if (f.collected && f.collectedAt != null) {
-              if (nowMs - f.collectedAt > POP_DURATION_MS) return false
-            }
+            if (f.collected && f.collectedAt != null) { if (nowMs - f.collectedAt > POP_DURATION_MS) return false }
             return true
           })
           .map((f) => {
-            if (f.collected) return f
-            if (f.progress >= 1) return f
-            return {
-              ...f,
-              progress: Math.min(1, f.progress + dt * fallRate)
-            }
+            if (f.collected || f.progress >= 1) return f
+            return { ...f, progress: Math.min(1, f.progress + dt * fallRate) }
           })
         return { ...prev, fallingLetters: updated }
       })
@@ -219,12 +208,10 @@ export function useGameState() {
     }
     lastTickRef.current = performance.now()
     fallAnimationRef.current = requestAnimationFrame(tick)
-    return () => {
-      if (fallAnimationRef.current) cancelAnimationFrame(fallAnimationRef.current)
-    }
+    return () => { if (fallAnimationRef.current) cancelAnimationFrame(fallAnimationRef.current) }
   }, [state.phase, state.level, state.paused])
 
-  // Level timer: time's up without completing word → lose life (respects pause)
+  // Level timer
   useEffect(() => {
     if (state.phase !== 'playing' || state.paused) return
     const remaining = Math.max(0, levelEndTimeRef.current - Date.now())
@@ -237,27 +224,16 @@ export function useGameState() {
         )
         if (wordComplete) return prev
         const newLives = prev.lives - 1
-        if (newLives <= 0) {
-          return { ...prev, phase: 'gameOver', lives: 0 }
-        }
-        return {
-          ...prev,
-          lives: newLives,
-          phase: 'levelComplete',
-          levelCompleteReason: 'outOfTime',
-          collectedLetters: []
-        }
+        if (newLives <= 0) return { ...prev, phase: 'gameOver', lives: 0 }
+        return { ...prev, lives: newLives, phase: 'levelComplete', levelCompleteReason: 'outOfTime', collectedLetters: [] }
       })
     }, remaining)
     return () => clearTimeout(timeout)
   }, [state.phase, state.level, state.levelStartTime, state.paused])
 
-  // Cleanup spawn interval when phase changes
+  // Cleanup spawn on phase change
   useEffect(() => {
-    if (state.phase !== 'playing' && spawnIntervalRef.current) {
-      clearInterval(spawnIntervalRef.current)
-      spawnIntervalRef.current = null
-    }
+    if (state.phase !== 'playing' && spawnIntervalRef.current) { clearInterval(spawnIntervalRef.current); spawnIntervalRef.current = null }
   }, [state.phase])
 
   const collectLetter = useCallback((id: string) => {
@@ -265,10 +241,18 @@ export function useGameState() {
       if (prev.phase !== 'playing') return prev
       const letter = prev.fallingLetters.find((f) => f.id === id)
       if (!letter || letter.collected) return prev
+
       const targetWord = prev.targetWord
       const countInWord = (l: string) => (targetWord.match(new RegExp(l, 'g')) || []).length
       const countCollected = (l: string) => prev.collectedLetters.filter((c) => c === l).length
-      if (countCollected(letter.letter) >= countInWord(letter.letter)) return prev
+
+      // Wrong tap: letter not needed
+      if (countCollected(letter.letter) >= countInWord(letter.letter)) {
+        vibrate([30, 50, 30])
+        return { ...prev, streak: 0, wrongTapAt: Date.now() }
+      }
+
+      vibrate(15)
       const newCollected = [...prev.collectedLetters, letter.letter]
       const wordComplete = [...new Set(targetWord)].every(
         (l) => countInWord(l) <= newCollected.filter((c) => c === l).length
@@ -281,25 +265,19 @@ export function useGameState() {
         ...prev,
         collectedLetters: newCollected,
         fallingLetters: newFalling,
+        streak: prev.streak + 1,
         phase: wordComplete ? 'levelComplete' : prev.phase,
         levelCompleteReason: wordComplete ? 'wordComplete' : prev.levelCompleteReason
       }
     })
   }, [])
 
-  const restart = useCallback(() => {
-    startLevel(1)
-  }, [startLevel])
+  const restart = useCallback(() => { startLevel(1) }, [startLevel])
 
-  // When transitioning to levelComplete, stop spawn
   useEffect(() => {
-    if (state.phase === 'levelComplete' && spawnIntervalRef.current) {
-      clearInterval(spawnIntervalRef.current)
-      spawnIntervalRef.current = null
-    }
+    if (state.phase === 'levelComplete' && spawnIntervalRef.current) { clearInterval(spawnIntervalRef.current); spawnIntervalRef.current = null }
   }, [state.phase])
 
-  /** Call after level complete modal: advance to next level or retry same level (out of time). */
   const startNextLevel = useCallback(() => {
     if (state.phase !== 'levelComplete') return
     if (state.levelCompleteReason === 'outOfTime') {
@@ -307,7 +285,7 @@ export function useGameState() {
       return
     }
     const nextLevel = state.level + 1
-    if (nextLevel > TOTAL_LEVELS) {
+    if (nextLevel > TOTAL_WORDS) {
       startLevel(1)
     } else {
       startLevel(nextLevel)
@@ -318,42 +296,24 @@ export function useGameState() {
     setState((prev) => (prev.phase === 'playing' ? { ...prev, paused } : prev))
   }, [])
 
-  // Save when modal is shown (between levels or game over)
+  // Save on modal display
   useEffect(() => {
     if (state.phase === 'levelComplete' || state.phase === 'gameOver') {
-      saveState({
-        version: 1,
-        phase: state.phase,
-        level: state.level,
-        lives: state.lives,
-        levelCompleteReason: state.levelCompleteReason
-      })
+      saveState({ version: 1, phase: state.phase, level: state.level, lives: state.lives, levelCompleteReason: state.levelCompleteReason })
     }
   }, [state.phase, state.level, state.lives, state.levelCompleteReason])
 
-  // Restore from localStorage or start fresh on first mount
+  // Restore on first mount
   useEffect(() => {
     if (hasInitializedRef.current) return
     hasInitializedRef.current = true
     const saved = loadSavedState()
-    if (saved && (saved.phase === 'levelComplete' || saved.phase === 'gameOver')) {
-      setState(restoredModalState(saved))
-      return
-    }
-    if (saved && saved.phase === 'playing') {
-      startLevel(saved.level, { lives: saved.lives })
-      return
-    }
+    if (saved && (saved.phase === 'levelComplete' || saved.phase === 'gameOver')) { setState(restoredModalState(saved)); return }
+    if (saved && saved.phase === 'playing') { startLevel(saved.level, { lives: saved.lives }); return }
     startLevel(1)
   }, [startLevel])
 
-  return {
-    state,
-    collectLetter,
-    goNextLevel: startNextLevel,
-    restart,
-    setPaused
-  }
+  return { state, collectLetter, goNextLevel: startNextLevel, restart, setPaused }
 }
 
 function initLevel(level: number, lives?: number): GameState {
@@ -367,6 +327,7 @@ function initLevel(level: number, lives?: number): GameState {
     fallingLetters: [],
     levelStartTime: Date.now(),
     lettersToSpawn: getLettersPerLevel(level, targetWord.length),
-    lettersSpawned: 0
+    lettersSpawned: 0,
+    streak: 0
   }
 }

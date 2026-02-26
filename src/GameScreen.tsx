@@ -22,7 +22,7 @@ export function GameScreen({ onGoHome }: GameScreenProps) {
         />
       )}
       {state.phase === 'gameOver' && (
-        <GameOverModal onRestart={restart} />
+        <GameOverModal level={state.level} onRestart={restart} onGoHome={onGoHome} />
       )}
     </>
   )

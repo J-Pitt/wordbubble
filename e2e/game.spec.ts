@@ -11,7 +11,7 @@ test.describe('Word Bubble game', () => {
     await page.goto('/')
     await page.getByTestId('start-game-button').click()
     await expect(page.getByTestId('game-area')).toBeVisible()
-    await expect(page.getByTestId('level')).toHaveText('Lv.1')
+    await expect(page.getByTestId('level')).toHaveText('1 / 50')
     await expect(page.getByTestId('lives')).toBeVisible()
     await expect(page.getByTestId('word-display')).toBeVisible()
   })

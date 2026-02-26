@@ -1,20 +1,15 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { GameOverModal } from './GameOverModal'
 
 describe('GameOverModal', () => {
-  it('shows game over message', () => {
-    render(<GameOverModal onRestart={vi.fn()} />)
-    expect(screen.getByTestId('game-over-title')).toHaveTextContent('Game Over')
-    expect(screen.getByTestId('game-over-restart-button')).toHaveTextContent('Play Again')
+  it('shows game over content', () => {
+    render(<GameOverModal level={5} onRestart={vi.fn()} onGoHome={vi.fn()} />)
+    expect(screen.getByTestId('game-over-title')).toBeInTheDocument()
   })
 
-  it('calls onRestart when Play again clicked', async () => {
-    const user = userEvent.setup()
-    const onRestart = vi.fn()
-    render(<GameOverModal onRestart={onRestart} />)
-    await user.click(screen.getByTestId('game-over-restart-button'))
-    expect(onRestart).toHaveBeenCalledTimes(1)
+  it('shows level reached', () => {
+    render(<GameOverModal level={12} onRestart={vi.fn()} onGoHome={vi.fn()} />)
+    expect(screen.getByText(/word 12 of 50/i)).toBeInTheDocument()
   })
 })

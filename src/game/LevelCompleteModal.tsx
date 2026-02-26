@@ -15,11 +15,11 @@ export function LevelCompleteModal({ reason, level, onNext, onGoHome }: LevelCom
       <div className="modal">
         <span className="modal-emoji">{isWordComplete ? '🎉' : '⏱️'}</span>
         <h2 className="modal-title" data-testid="modal-title">
-          {isWordComplete ? 'Nice!' : 'Time\'s Up!'}
+          {isWordComplete ? 'Nice!' : "Time's Up!"}
         </h2>
         <p className="modal-message">
           {isWordComplete
-            ? `Level ${level} cleared — keep it going!`
+            ? `Word ${level} of 50 complete — keep going!`
             : 'You lost a life. Give it another shot!'}
         </p>
         <button
@@ -28,7 +28,7 @@ export function LevelCompleteModal({ reason, level, onNext, onGoHome }: LevelCom
           onClick={onNext}
           data-testid="modal-next-button"
         >
-          {isWordComplete ? 'Next Level' : 'Try Again'}
+          {isWordComplete ? 'Next Word' : 'Try Again'}
         </button>
         {!isWordComplete && onGoHome && (
           <button

@@ -1,31 +1,23 @@
 /**
- * 20 levels: word length grows from 3 to ~8 letters.
- * Each level has one target word; falling letters include the word's letters plus distractors.
+ * 50 words: 1–10 are 3-letter, 11–20 are 4-letter, 21–50 are 5-letter.
  */
 export const LEVEL_WORDS: readonly string[] = [
-  'cat',    // 1
-  'run',    // 2
-  'dog',    // 3
-  'sun',    // 4
-  'hat',    // 5
-  'fish',   // 6
-  'bird',   // 7
-  'moon',   // 8
-  'star',   // 9
-  'tree',   // 10
-  'water',  // 11
-  'light',  // 12
-  'cloud',  // 13
-  'heart',  // 14
-  'music',  // 15
-  'happy',  // 16
-  'dream',  // 17
-  'river',  // 18
-  'spark',  // 19
-  'bubble'  // 20
+  // 3-letter (1–10)
+  'cat',   'run',   'dog',   'sun',   'hat',
+  'fox',   'pen',   'map',   'jar',   'web',
+  // 4-letter (11–20)
+  'fish',  'bird',  'moon',  'star',  'tree',
+  'frog',  'kite',  'drum',  'lamp',  'ship',
+  // 5-letter (21–50)
+  'water', 'light', 'cloud', 'heart', 'music',
+  'happy', 'dream', 'river', 'spark', 'grape',
+  'flame', 'storm', 'beach', 'magic', 'ocean',
+  'plant', 'tiger', 'frost', 'candy', 'vivid',
+  'youth', 'blaze', 'crane', 'dwarf', 'globe',
+  'jewel', 'pixel', 'quilt', 'swing', 'whirl',
 ]
 
-export const TOTAL_LEVELS = LEVEL_WORDS.length
+export const TOTAL_WORDS = LEVEL_WORDS.length
 
 export function getWordForLevel(level: number): string {
   const index = Math.max(0, Math.min(level - 1, LEVEL_WORDS.length - 1))

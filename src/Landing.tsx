@@ -1,4 +1,4 @@
-import { hasSavedGame } from './game/useGameState'
+import { hasSavedGame, loadHighScore } from './game/useGameState'
 import './Landing.css'
 
 interface LandingProps {
@@ -32,6 +32,7 @@ const DECOR_BUBBLES = [
 
 export function Landing({ onContinue, onNewGame }: LandingProps) {
   const savedGame = hasSavedGame()
+  const highScore = loadHighScore()
 
   return (
     <div className="landing" data-testid="landing">
@@ -62,8 +63,16 @@ export function Landing({ onContinue, onNewGame }: LandingProps) {
         </h1>
         <p className="landing-tagline">
           Catch the letters. Spell the word.<br />
-          20 levels. 3 lives. How far can you go?
+          50 words. 3 lives. How far can you go?
         </p>
+        {highScore && (
+          <div className="landing-highscore" data-testid="highscore">
+            <span className="landing-highscore-trophy">🏆</span>
+            <span className="landing-highscore-text">
+              {highScore.name} — Word {highScore.level}
+            </span>
+          </div>
+        )}
       </header>
 
       <section className="landing-middle">

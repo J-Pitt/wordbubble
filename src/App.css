@@ -13,6 +13,19 @@
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #0f1028 0%, var(--bg-dark) 100%);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.app--hidden {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.app--visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ============================
@@ -431,4 +444,75 @@
   color: var(--text);
   background: linear-gradient(180deg, #222547 0%, #1a1d38 100%);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================
+   Screen Shake (wrong tap)
+   ============================ */
+.game-area--shake {
+  animation: screen-shake 0.4s ease-out;
+}
+
+@keyframes screen-shake {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(3px); }
+  75% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+/* ============================
+   Streak Counter
+   ============================ */
+.streak-indicator {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0.25rem 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  animation: streak-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+@keyframes streak-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================
+   High Score Input
+   ============================ */
+.highscore-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.highscore-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.highscore-input::placeholder {
+  color: var(--text-muted);
+}
+
+.highscore-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
 }

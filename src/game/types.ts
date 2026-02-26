@@ -35,4 +35,8 @@ export interface GameState {
   lettersToSpawn: number
   /** Letters spawned so far */
   lettersSpawned: number
+  /** Consecutive correct taps */
+  streak: number
+  /** Timestamp of last wrong tap (for screen shake) */
+  wrongTapAt?: number
 }

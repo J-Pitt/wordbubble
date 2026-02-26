@@ -14,6 +14,7 @@ function makeState(overrides: Partial<GameState> = {}): GameState {
     levelStartTime: Date.now(),
     lettersToSpawn: 10,
     lettersSpawned: 0,
+    streak: 0,
     ...overrides
   }
 }

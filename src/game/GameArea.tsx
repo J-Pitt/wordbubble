@@ -14,6 +14,7 @@ interface GameAreaProps {
 export function GameArea({ state, onCollectLetter, onPause, onGoHome }: GameAreaProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [height, setHeight] = useState(400)
+  const [shaking, setShaking] = useState(false)
 
   useEffect(() => {
     const el = containerRef.current
@@ -24,8 +25,20 @@ export function GameArea({ state, onCollectLetter, onPause, onGoHome }: GameArea
     return () => ro.disconnect()
   }, [])
 
+  // Screen shake on wrong tap
+  useEffect(() => {
+    if (!state.wrongTapAt) return
+    setShaking(true)
+    const t = setTimeout(() => setShaking(false), 400)
+    return () => clearTimeout(t)
+  }, [state.wrongTapAt])
+
   return (
-    <div className="game-area" ref={containerRef} data-testid="game-area">
+    <div
+      className={`game-area ${shaking ? 'game-area--shake' : ''}`}
+      ref={containerRef}
+      data-testid="game-area"
+    >
       <header className="game-header">
         <div className="lives" data-testid="lives">
           {'♥'.repeat(state.lives)}
@@ -36,10 +49,15 @@ export function GameArea({ state, onCollectLetter, onPause, onGoHome }: GameArea
           isPlaying={state.phase === 'playing' && !state.paused}
         />
         <span className="level-label" data-testid="level">
-          Lv.{state.level}
+          {state.level} / 50
         </span>
       </header>
       <WordDisplay state={state} />
+      {state.streak >= 3 && state.phase === 'playing' && (
+        <div className="streak-indicator" data-testid="streak">
+          {state.streak}x streak!
+        </div>
+      )}
       <div className="falling-zone">
         {state.fallingLetters.map((f) => (
           <FallingLetterBall
