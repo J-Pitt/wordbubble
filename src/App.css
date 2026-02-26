@@ -1,0 +1,159 @@
+.app {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* ----- Game area ----- */
+.game-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.75rem;
+  position: relative;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  flex-shrink: 0;
+}
+
+.lives {
+  font-size: 1.5rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+}
+
+.level-label {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* ----- Word at top ----- */
+.word-display {
+  flex-shrink: 0;
+  padding: 1rem 0;
+}
+
+.word-letters {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.word-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  font-weight: 700;
+  transition: background 0.2s, color 0.2s;
+}
+
+.word-char.filled {
+  background: var(--accent);
+  color: white;
+}
+
+/* ----- Falling zone ----- */
+.falling-zone {
+  flex: 1;
+  position: relative;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+.falling-ball {
+  position: absolute;
+  width: 3rem;
+  height: 3rem;
+  margin-left: -1.5rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--ball-color, var(--ball-1));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+  z-index: 2;
+}
+
+.falling-ball:active {
+  transform: scale(0.95);
+}
+
+.falling-ball-letter {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ----- Modals ----- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--bg-panel);
+  border-radius: 16px;
+  padding: 1.75rem;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.modal-message {
+  margin: 0 0 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.modal-button {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-button:hover {
+  background: var(--accent-dim);
+}
+
+.modal-button:active {
+  transform: scale(0.98);
+}

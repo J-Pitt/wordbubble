@@ -1,0 +1,37 @@
+:root {
+  --bg-dark: #0f0f1a;
+  --bg-panel: #1a1a2e;
+  --accent: #e94560;
+  --accent-dim: #c73e54;
+  --ball-1: #e94560;
+  --ball-2: #0f3460;
+  --ball-3: #533483;
+  --ball-4: #16c79a;
+  --ball-5: #ffc93c;
+  --text: #eaeaea;
+  --text-muted: #a0a0a0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-dark);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
