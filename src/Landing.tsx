@@ -1,7 +1,9 @@
+import { hasSavedGame } from './game/useGameState'
 import './Landing.css'
 
 interface LandingProps {
-  onStart: () => void
+  onContinue: () => void
+  onNewGame: () => void
 }
 
 const DECOR_BUBBLES = [
@@ -14,9 +16,23 @@ const DECOR_BUBBLES = [
   { letter: 'B', color: '#4a6fa5', x: 35, y: 72, size: 42, delay: 1.8 },
   { letter: 'L', color: '#7b5cbf', x: 90, y: 76, size: 36, delay: 2.1 },
   { letter: 'E', color: '#2dd4a0', x: 55, y: 84, size: 48, delay: 2.4 },
+  { letter: 'A', color: '#ffc93c', x: 48, y: 8, size: 34, delay: 0.5 },
+  { letter: 'G', color: '#ff6b7a', x: 65, y: 30, size: 36, delay: 1.1 },
+  { letter: 'P', color: '#2dd4a0', x: 5, y: 88, size: 42, delay: 2.7 },
+  { letter: 'T', color: '#4a6fa5', x: 92, y: 55, size: 34, delay: 0.8 },
+  { letter: 'S', color: '#7b5cbf', x: 18, y: 52, size: 30, delay: 1.9 },
+  { letter: 'M', color: '#ffc93c', x: 60, y: 68, size: 38, delay: 2.2 },
+  { letter: 'K', color: '#ff6b7a', x: 40, y: 92, size: 32, delay: 3.0 },
+  { letter: 'F', color: '#2dd4a0', x: 82, y: 88, size: 36, delay: 2.6 },
+  { letter: 'N', color: '#4a6fa5', x: 50, y: 28, size: 30, delay: 1.4 },
+  { letter: 'H', color: '#7b5cbf', x: 30, y: 10, size: 32, delay: 0.2 },
+  { letter: 'Z', color: '#ffc93c', x: 42, y: 48, size: 34, delay: 1.6 },
+  { letter: 'J', color: '#2dd4a0', x: 62, y: 44, size: 30, delay: 2.0 },
 ]
 
-export function Landing({ onStart }: LandingProps) {
+export function Landing({ onContinue, onNewGame }: LandingProps) {
+  const savedGame = hasSavedGame()
+
   return (
     <div className="landing" data-testid="landing">
       <div className="landing-bg" aria-hidden>
@@ -51,14 +67,35 @@ export function Landing({ onStart }: LandingProps) {
       </header>
 
       <section className="landing-middle">
-        <button
-          type="button"
-          className="landing-start"
-          onClick={onStart}
-          data-testid="start-game-button"
-        >
-          <span className="landing-start-text">Play</span>
-        </button>
+        {savedGame ? (
+          <div className="landing-buttons">
+            <button
+              type="button"
+              className="landing-bubble-btn landing-bubble-btn--continue"
+              onClick={onContinue}
+              data-testid="start-game-button"
+            >
+              <span className="landing-bubble-btn-text">Continue</span>
+            </button>
+            <button
+              type="button"
+              className="landing-bubble-btn landing-bubble-btn--new"
+              onClick={onNewGame}
+              data-testid="new-game-button"
+            >
+              <span className="landing-bubble-btn-text">New Game</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="landing-bubble-btn landing-bubble-btn--play"
+            onClick={onNewGame}
+            data-testid="start-game-button"
+          >
+            <span className="landing-bubble-btn-text">Play</span>
+          </button>
+        )}
       </section>
 
       <footer className="landing-footer">

@@ -30,10 +30,10 @@ describe('constants', () => {
     expect(getLettersPerLevel(20, 6)).toBeGreaterThan(getLettersPerLevel(1, 3))
   })
 
-  it('getFallDurationMs decreases as level increases (faster fall)', () => {
+  it('getFallDurationMs is constant across all levels', () => {
     const f1 = getFallDurationMs(1)
     const f20 = getFallDurationMs(20)
-    expect(f1).toBeGreaterThan(f20)
-    expect(f20).toBeGreaterThanOrEqual(2500)
+    expect(f1).toBe(6000)
+    expect(f20).toBe(6000)
   })
 })

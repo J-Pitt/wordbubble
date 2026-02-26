@@ -73,6 +73,18 @@ export interface SavedState {
   levelCompleteReason?: LevelCompleteReason
 }
 
+export function hasSavedGame(): boolean {
+  return loadSavedState() !== null
+}
+
+export function clearSavedGame(): void {
+  try {
+    localStorage.removeItem(SAVE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
 function loadSavedState(): SavedState | null {
   try {
     const raw = localStorage.getItem(SAVE_KEY)

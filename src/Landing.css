@@ -120,7 +120,7 @@
   max-width: 280px;
 }
 
-/* === Middle section: play button (fills remaining space) === */
+/* === Middle section: play button(s) (fills remaining space) === */
 .landing-middle {
   position: relative;
   z-index: 1;
@@ -130,63 +130,111 @@
   justify-content: center;
 }
 
-.landing-start {
-  width: 88px;
-  height: 88px;
+.landing-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* Shared bubble button base */
+.landing-bubble-btn {
+  --btn-color: var(--accent);
+  --btn-color-dim: var(--accent-dim);
+  --btn-glow: var(--accent-glow);
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
-  border: none;
-  background: linear-gradient(145deg, var(--accent), var(--accent-dim));
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: radial-gradient(circle at 35% 28%, rgba(255,255,255,0.35), var(--btn-color) 58%);
   color: white;
   cursor: pointer;
   position: relative;
   box-shadow:
-    0 0 0 4px rgba(255, 107, 122, 0.15),
-    0 0 0 12px rgba(255, 107, 122, 0.06),
-    0 8px 32px rgba(255, 107, 122, 0.35);
+    inset 0 -4px 8px rgba(0,0,0,0.3),
+    inset 0 2px 2px rgba(255,255,255,0.2),
+    0 0 0 4px color-mix(in srgb, var(--btn-color) 15%, transparent),
+    0 0 0 10px color-mix(in srgb, var(--btn-color) 6%, transparent),
+    0 8px 32px var(--btn-glow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   animation: cta-pulse 2.5s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.landing-start::before {
+.landing-bubble-btn::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.3), transparent 60%);
+  background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.35), transparent 55%);
+  pointer-events: none;
 }
 
-.landing-start-text {
+.landing-bubble-btn-text {
   position: relative;
   z-index: 1;
-  font-size: 1.35rem;
+  font-size: 1rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  line-height: 1.15;
+  text-align: center;
+}
+
+/* Single play button — a bit bigger */
+.landing-bubble-btn--play {
+  width: 120px;
+  height: 120px;
+}
+
+.landing-bubble-btn--play .landing-bubble-btn-text {
+  font-size: 1.3rem;
+}
+
+/* Continue button — accent pink */
+.landing-bubble-btn--continue {
+  --btn-color: var(--accent);
+  --btn-color-dim: var(--accent-dim);
+  --btn-glow: var(--accent-glow);
+}
+
+/* New Game button — blue/purple */
+.landing-bubble-btn--new {
+  --btn-color: #4a6fa5;
+  --btn-color-dim: #3b5d8e;
+  --btn-glow: rgba(74, 111, 165, 0.3);
+  animation-delay: 0.4s;
 }
 
 @keyframes cta-pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 4px rgba(255, 107, 122, 0.15),
-      0 0 0 12px rgba(255, 107, 122, 0.06),
-      0 8px 32px rgba(255, 107, 122, 0.35);
+      inset 0 -4px 8px rgba(0,0,0,0.3),
+      inset 0 2px 2px rgba(255,255,255,0.2),
+      0 0 0 4px color-mix(in srgb, var(--btn-color) 15%, transparent),
+      0 0 0 10px color-mix(in srgb, var(--btn-color) 6%, transparent),
+      0 8px 32px var(--btn-glow);
   }
   50% {
     box-shadow:
-      0 0 0 6px rgba(255, 107, 122, 0.2),
-      0 0 0 18px rgba(255, 107, 122, 0.08),
-      0 12px 40px rgba(255, 107, 122, 0.4);
+      inset 0 -4px 8px rgba(0,0,0,0.3),
+      inset 0 2px 2px rgba(255,255,255,0.2),
+      0 0 0 6px color-mix(in srgb, var(--btn-color) 20%, transparent),
+      0 0 0 16px color-mix(in srgb, var(--btn-color) 8%, transparent),
+      0 12px 40px var(--btn-glow);
   }
 }
 
-.landing-start:hover {
+.landing-bubble-btn:hover {
   transform: scale(1.08);
 }
 
-.landing-start:active {
-  transform: scale(0.96);
+.landing-bubble-btn:active {
+  transform: scale(0.93);
   animation: none;
 }
 

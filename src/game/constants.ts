@@ -14,10 +14,8 @@ export function getLettersPerLevel(level: number, wordLength: number): number {
 }
 
 /** Fall animation duration in ms (how long one letter takes to cross the screen). */
-export function getFallDurationMs(level: number): number {
-  const base = 6000
-  const perLevel = -200
-  return Math.max(2500, base + perLevel * (level - 1))
+export function getFallDurationMs(_level: number): number {
+  return 6000
 }
 
 export const BALL_COLORS = [
